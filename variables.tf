@@ -13,15 +13,15 @@ variable "environment" {
   type        = string
 }
 
-variable "root_domain" {
-  description = "The root domain which will be used as base for the Cognito domain"
-  type        = string
-}
+# variable "root_domain" {
+#   description = "The root domain which will be used as base for the Cognito domain"
+#   type        = string
+# }
 
-variable "hosted_zone_id" {
-  description = "The Id of the hosted zone where the records needs to be created"
-  type        = string
-}
+# variable "hosted_zone_id" {
+#   description = "The Id of the hosted zone where the records needs to be created"
+#   type        = string
+# }
 
 variable "users_config_file_path" {
   description = "The file path where the users config for the congito are stored"
@@ -110,11 +110,11 @@ variable "explicit_auth_flows" {
   ]
 }
 
-variable "create_dummy_record" {
-  description = "Whether to create a dummy record for the user pool domain to be correctly created the first time. This is necessary when first creating the user pool domain, after that, this variable can be set to false to destroy the dummy record"
-  type        = bool
-  default     = true
-}
+# variable "create_dummy_record" {
+#   description = "Whether to create a dummy record for the user pool domain to be correctly created the first time. This is necessary when first creating the user pool domain, after that, this variable can be set to false to destroy the dummy record"
+#   type        = bool
+#   default     = true
+# }
 
 variable "iam_cognito_unauthenticated_user_policy_json" {
   description = "Json policy that will be associated with an unauthenticated user at identity pool level"

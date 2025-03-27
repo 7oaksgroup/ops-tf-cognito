@@ -13,10 +13,10 @@ output "cognito_user_pool_arn" {
   value       = aws_cognito_user_pool.this.arn
 }
 
-output "cognito_user_pool_domain" {
-  description = "The domain of the Cognito User Pool."
-  value       = aws_cognito_user_pool_domain.this.domain
-}
+# output "cognito_user_pool_domain" {
+#   description = "The domain of the Cognito User Pool."
+#   value       = aws_cognito_user_pool_domain.this.domain
+# }
 
 output "cognito_user_pool_client_id" {
   description = "The Client ID of the Cognito User Pool."

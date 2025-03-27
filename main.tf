@@ -114,35 +114,35 @@ resource "aws_cognito_user_pool" "this" {
   }
 }
 
-#====================================================================================
-# Certificate for the Pool Custom Domain
-#====================================================================================
-resource "aws_acm_certificate" "this" {
-  domain_name       = local.cognito_pool_domain
-  validation_method = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  provider = aws.us_east_1
-}
-
-resource "aws_route53_record" "cert_validation" {
-  allow_overwrite = true
-  name            = tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_name
-  records         = [tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_value]
-  type            = tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_type
-  zone_id         = var.hosted_zone_id
-  ttl             = 60
-}
-
-resource "aws_acm_certificate_validation" "this" {
-  certificate_arn         = aws_acm_certificate.this.arn
-  validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
-
-  provider = aws.us_east_1
-}
+# #====================================================================================
+# # Certificate for the Pool Custom Domain
+# #====================================================================================
+# resource "aws_acm_certificate" "this" {
+#   domain_name       = local.cognito_pool_domain
+#   validation_method = "DNS"
+#
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+#
+#   provider = aws.us_east_1
+# }
+#
+# resource "aws_route53_record" "cert_validation" {
+#   allow_overwrite = true
+#   name            = tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_name
+#   records         = [tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_value]
+#   type            = tolist(aws_acm_certificate.this.domain_validation_options)[0].resource_record_type
+#   zone_id         = var.hosted_zone_id
+#   ttl             = 60
+# }
+#
+# resource "aws_acm_certificate_validation" "this" {
+#   certificate_arn         = aws_acm_certificate.this.arn
+#   validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
+#
+#   provider = aws.us_east_1
+# }
 
 #====================================================================================
 # User Pool Custom Domain
@@ -154,37 +154,37 @@ resource "aws_acm_certificate_validation" "this" {
 # we can create a dummy A record pointing to 8.8.8.8, create the custom record
 # and then delete the dummy record.
 #====================================================================================
-resource "aws_cognito_user_pool_domain" "this" {
-  domain          = local.cognito_pool_domain
-  user_pool_id    = aws_cognito_user_pool.this.id
-  certificate_arn = aws_acm_certificate_validation.this.certificate_arn
-
-  depends_on = [
-    aws_route53_record.dummy
-  ]
-}
-
-resource "aws_route53_record" "dummy" {
-  count = var.create_dummy_record ? 1 : 0
-
-  name    = local.cognito_root_domain
-  type    = "A"
-  zone_id = var.hosted_zone_id
-  records = ["8.8.8.8"]
-  ttl     = 300
-}
-
-resource "aws_route53_record" "cognito_user_pool_domain" {
-  name    = aws_cognito_user_pool_domain.this.domain
-  type    = "A"
-  zone_id = var.hosted_zone_id
-  alias {
-    evaluate_target_health = false
-
-    name    = aws_cognito_user_pool_domain.this.cloudfront_distribution
-    zone_id = aws_cognito_user_pool_domain.this.cloudfront_distribution_zone_id
-  }
-}
+# resource "aws_cognito_user_pool_domain" "this" {
+#   domain          = local.cognito_pool_domain
+#   user_pool_id    = aws_cognito_user_pool.this.id
+#   certificate_arn = aws_acm_certificate_validation.this.certificate_arn
+#
+#   depends_on = [
+#     aws_route53_record.dummy
+#   ]
+# }
+#
+# resource "aws_route53_record" "dummy" {
+#   count = var.create_dummy_record ? 1 : 0
+#
+#   name    = local.cognito_root_domain
+#   type    = "A"
+#   zone_id = var.hosted_zone_id
+#   records = ["8.8.8.8"]
+#   ttl     = 300
+# }
+#
+# resource "aws_route53_record" "cognito_user_pool_domain" {
+#   name    = aws_cognito_user_pool_domain.this.domain
+#   type    = "A"
+#   zone_id = var.hosted_zone_id
+#   alias {
+#     evaluate_target_health = false
+#
+#     name    = aws_cognito_user_pool_domain.this.cloudfront_distribution
+#     zone_id = aws_cognito_user_pool_domain.this.cloudfront_distribution_zone_id
+#   }
+# }
 
 #====================================================================================
 # Pool Client With Cognito as IdP
