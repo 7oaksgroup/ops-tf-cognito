@@ -216,109 +216,109 @@ resource "aws_cognito_identity_pool" "this" {
   }
 }
 
-#====================================================================================
-# Iam roles that the authenticated and unauthenticated user will have
-#====================================================================================
-data "aws_iam_policy_document" "cognito_assume" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Federated"
-      identifiers = ["cognito-identity.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    condition {
-      test     = "StringEquals"
-      variable = "cognito-identity.amazonaws.com:aud"
-      values   = [aws_cognito_identity_pool.this.id]
-    }
-
-    condition {
-      test     = "ForAnyValue:StringLike"
-      variable = "cognito-identity.amazonaws.com:amr"
-      values   = ["authenticated"]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "cognito_unauthenticated_assume" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Federated"
-      identifiers = ["cognito-identity.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    condition {
-      test     = "StringEquals"
-      variable = "cognito-identity.amazonaws.com:aud"
-      values   = [aws_cognito_identity_pool.this.id]
-    }
-
-    condition {
-      test     = "ForAnyValue:StringLike"
-      variable = "cognito-identity.amazonaws.com:amr"
-      values   = ["unauthenticated"]
-    }
-  }
-}
-
-resource "aws_iam_role" "cognito_user" {
-  count = var.iam_cognito_authenticated_user_policy_json != null ? 1 : 0
-
-  name               = "${var.prefix}-cognito-groups-${var.identifier}"
-  assume_role_policy = data.aws_iam_policy_document.cognito_assume.json
-}
-
-resource "aws_iam_role_policy" "cognito_user" {
-  count = var.iam_cognito_authenticated_user_policy_json != null ? 1 : 0
-
-  role   = aws_iam_role.cognito_user[0].id
-  name   = "custom"
-  policy = var.iam_cognito_authenticated_user_policy_json
-}
-
-resource "aws_iam_role" "cognito_unauthenticated_user" {
-  count = var.iam_cognito_unauthenticated_user_policy_json != null ? 1 : 0
-
-  name               = "${var.prefix}-cognito-unauthenticated-${var.identifier}"
-  assume_role_policy = data.aws_iam_policy_document.cognito_unauthenticated_assume.json
-}
-
-resource "aws_iam_role_policy" "cognito_unauthenticated_user" {
-  count = var.iam_cognito_unauthenticated_user_policy_json != null ? 1 : 0
-
-  role   = aws_iam_role.cognito_unauthenticated_user[0].id
-  name   = "custom"
-  policy = var.iam_cognito_unauthenticated_user_policy_json
-}
-
-resource "aws_cognito_identity_pool_roles_attachment" "this" {
-  count = var.iam_cognito_authenticated_user_policy_json == null && var.iam_cognito_unauthenticated_user_policy_json == null ? 0 : 1
-
-  identity_pool_id = aws_cognito_identity_pool.this.id
-
-  role_mapping {
-    identity_provider         = "${aws_cognito_user_pool.this.endpoint}:${aws_cognito_user_pool_client.this.id}"
-    type                      = "Token"
-    ambiguous_role_resolution = "AuthenticatedRole"
-  }
-
-  roles = var.iam_cognito_authenticated_user_policy_json == null ? {
-    "unauthenticated" = aws_iam_role.cognito_unauthenticated_user[0].arn
-    } : var.iam_cognito_unauthenticated_user_policy_json == null ? {
-    "authenticated" = aws_iam_role.cognito_user[0].arn
-    } : {
-    "unauthenticated" = aws_iam_role.cognito_unauthenticated_user[0].arn
-    "authenticated"   = aws_iam_role.cognito_user[0].arn
-  }
-}
+# #====================================================================================
+# # Iam roles that the authenticated and unauthenticated user will have
+# #====================================================================================
+# data "aws_iam_policy_document" "cognito_assume" {
+#   statement {
+#     effect = "Allow"
+#
+#     principals {
+#       type        = "Federated"
+#       identifiers = ["cognito-identity.amazonaws.com"]
+#     }
+#
+#     actions = ["sts:AssumeRoleWithWebIdentity"]
+#
+#     condition {
+#       test     = "StringEquals"
+#       variable = "cognito-identity.amazonaws.com:aud"
+#       values   = [aws_cognito_identity_pool.this.id]
+#     }
+#
+#     condition {
+#       test     = "ForAnyValue:StringLike"
+#       variable = "cognito-identity.amazonaws.com:amr"
+#       values   = ["authenticated"]
+#     }
+#   }
+# }
+#
+# data "aws_iam_policy_document" "cognito_unauthenticated_assume" {
+#   statement {
+#     effect = "Allow"
+#
+#     principals {
+#       type        = "Federated"
+#       identifiers = ["cognito-identity.amazonaws.com"]
+#     }
+#
+#     actions = ["sts:AssumeRoleWithWebIdentity"]
+#
+#     condition {
+#       test     = "StringEquals"
+#       variable = "cognito-identity.amazonaws.com:aud"
+#       values   = [aws_cognito_identity_pool.this.id]
+#     }
+#
+#     condition {
+#       test     = "ForAnyValue:StringLike"
+#       variable = "cognito-identity.amazonaws.com:amr"
+#       values   = ["unauthenticated"]
+#     }
+#   }
+# }
+#
+# resource "aws_iam_role" "cognito_user" {
+#   count = var.iam_cognito_authenticated_user_policy_json != null ? 1 : 0
+#
+#   name               = "${var.prefix}-cognito-groups-${var.identifier}"
+#   assume_role_policy = data.aws_iam_policy_document.cognito_assume.json
+# }
+#
+# resource "aws_iam_role_policy" "cognito_user" {
+#   count = var.iam_cognito_authenticated_user_policy_json != null ? 1 : 0
+#
+#   role   = aws_iam_role.cognito_user[0].id
+#   name   = "custom"
+#   policy = var.iam_cognito_authenticated_user_policy_json
+# }
+#
+# resource "aws_iam_role" "cognito_unauthenticated_user" {
+#   count = var.iam_cognito_unauthenticated_user_policy_json != null ? 1 : 0
+#
+#   name               = "${var.prefix}-cognito-unauthenticated-${var.identifier}"
+#   assume_role_policy = data.aws_iam_policy_document.cognito_unauthenticated_assume.json
+# }
+#
+# resource "aws_iam_role_policy" "cognito_unauthenticated_user" {
+#   count = var.iam_cognito_unauthenticated_user_policy_json != null ? 1 : 0
+#
+#   role   = aws_iam_role.cognito_unauthenticated_user[0].id
+#   name   = "custom"
+#   policy = var.iam_cognito_unauthenticated_user_policy_json
+# }
+#
+# resource "aws_cognito_identity_pool_roles_attachment" "this" {
+#   count = var.iam_cognito_authenticated_user_policy_json == null && var.iam_cognito_unauthenticated_user_policy_json == null ? 0 : 1
+#
+#   identity_pool_id = aws_cognito_identity_pool.this.id
+#
+#   role_mapping {
+#     identity_provider         = "${aws_cognito_user_pool.this.endpoint}:${aws_cognito_user_pool_client.this.id}"
+#     type                      = "Token"
+#     ambiguous_role_resolution = "AuthenticatedRole"
+#   }
+#
+#   roles = var.iam_cognito_authenticated_user_policy_json == null ? {
+#     "unauthenticated" = aws_iam_role.cognito_unauthenticated_user[0].arn
+#     } : var.iam_cognito_unauthenticated_user_policy_json == null ? {
+#     "authenticated" = aws_iam_role.cognito_user[0].arn
+#     } : {
+#     "unauthenticated" = aws_iam_role.cognito_unauthenticated_user[0].arn
+#     "authenticated"   = aws_iam_role.cognito_user[0].arn
+#   }
+# }
 
 #====================================================================================
 # Create Groups

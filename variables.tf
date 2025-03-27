@@ -116,14 +116,14 @@ variable "explicit_auth_flows" {
 #   default     = true
 # }
 
-variable "iam_cognito_unauthenticated_user_policy_json" {
-  description = "Json policy that will be associated with an unauthenticated user at identity pool level"
-  type        = string
-  default     = null
-}
+# variable "iam_cognito_unauthenticated_user_policy_json" {
+#   description = "Json policy that will be associated with an unauthenticated user at identity pool level"
+#   type        = string
+#   default     = null
+# }
 
-variable "iam_cognito_authenticated_user_policy_json" {
-  description = "Json policy that will be associated with an authenticated user at identity pool level"
-  type        = string
-  default     = null
-}
+# variable "iam_cognito_authenticated_user_policy_json" {
+#   description = "Json policy that will be associated with an authenticated user at identity pool level"
+#   type        = string
+#   default     = null
+# }
