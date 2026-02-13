@@ -110,6 +110,24 @@ variable "explicit_auth_flows" {
   ]
 }
 
+variable "identity_providers" {
+  description = "Map of identity providers to configure (e.g. Google, Facebook)"
+  type = map(object({
+    provider_type = string           # "Google", "Facebook", "LoginWithAmazon", "OIDC", "SAML"
+    client_id     = string
+    client_secret = string
+    scopes        = optional(list(string), [])
+    attributes    = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "user_pool_domain_prefix" {
+  description = "Prefix for the Cognito hosted UI domain (creates <prefix>.auth.<region>.amazoncognito.com). Required when using social identity providers."
+  type        = string
+  default     = null
+}
+
 # variable "create_dummy_record" {
 #   description = "Whether to create a dummy record for the user pool domain to be correctly created the first time. This is necessary when first creating the user pool domain, after that, this variable can be set to false to destroy the dummy record"
 #   type        = bool

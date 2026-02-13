@@ -187,6 +187,45 @@ resource "aws_cognito_user_pool" "this" {
 # }
 
 #====================================================================================
+# Cognito Hosted UI Domain (required for social/OIDC login flows)
+#====================================================================================
+resource "aws_cognito_user_pool_domain" "prefix" {
+  count        = var.user_pool_domain_prefix != null ? 1 : 0
+  domain       = var.user_pool_domain_prefix
+  user_pool_id = aws_cognito_user_pool.this.id
+}
+
+#====================================================================================
+# Identity Providers (Google, etc.)
+#====================================================================================
+resource "aws_cognito_identity_provider" "this" {
+  for_each = var.identity_providers
+
+  user_pool_id  = aws_cognito_user_pool.this.id
+  provider_name = each.key
+  provider_type = each.value.provider_type
+
+  provider_details = merge(
+    {
+      client_id        = each.value.client_id
+      client_secret    = each.value.client_secret
+      authorize_scopes = join(" ", each.value.scopes)
+    },
+    each.value.provider_type == "Google" ? {
+      oidc_issuer = "https://accounts.google.com"
+    } : {}
+  )
+
+  attribute_mapping = merge(
+    {
+      email    = "email"
+      username = "sub"
+    },
+    each.value.attributes
+  )
+}
+
+#====================================================================================
 # Pool Client With Cognito as IdP
 #====================================================================================
 resource "aws_cognito_user_pool_client" "this" {
@@ -199,6 +238,8 @@ resource "aws_cognito_user_pool_client" "this" {
   allowed_oauth_scopes                 = var.oauth_scopes
   supported_identity_providers         = var.supported_identity_provider
   explicit_auth_flows                  = var.explicit_auth_flows
+
+  depends_on = [aws_cognito_identity_provider.this]
 }
 
 #====================================================================================
