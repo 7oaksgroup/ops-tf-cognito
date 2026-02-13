@@ -113,7 +113,7 @@ variable "explicit_auth_flows" {
 variable "identity_providers" {
   description = "Map of identity providers to configure (e.g. Google, Facebook)"
   type = map(object({
-    provider_type = string           # "Google", "Facebook", "LoginWithAmazon", "OIDC", "SAML"
+    provider_type = string # "Google", "Facebook", "LoginWithAmazon", "OIDC", "SAML"
     client_id     = string
     client_secret = string
     scopes        = optional(list(string), [])

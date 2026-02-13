@@ -424,7 +424,7 @@ resource "aws_cognito_user_in_group" "this" {
 # Parameter Store
 #====================================================================================
 resource "aws_ssm_parameter" "cognito_user_pool_client_id" {
-  name  = "/${var.prefix}-${var.identifier}/cognito/user-pool/client-id"
+  name  = "/${var.prefix}-${var.environment}-${var.identifier}/cognito/user-pool/client-id"
   type  = "SecureString"
   value = aws_cognito_user_pool_client.this.id
 }
