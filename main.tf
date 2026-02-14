@@ -57,7 +57,7 @@ resource "aws_cognito_user_pool" "this" {
     name                     = "given_name"
     attribute_data_type      = "String"
     developer_only_attribute = false
-    mutable                  = false
+    mutable                  = true
     required                 = true
 
     string_attribute_constraints {
@@ -70,7 +70,7 @@ resource "aws_cognito_user_pool" "this" {
     name                     = "family_name"
     attribute_data_type      = "String"
     developer_only_attribute = false
-    mutable                  = false
+    mutable                  = true
     required                 = true
 
     string_attribute_constraints {
