@@ -223,6 +223,10 @@ resource "aws_cognito_identity_provider" "this" {
     },
     each.value.attributes
   )
+
+  lifecycle {
+    ignore_changes = [provider_details]
+  }
 }
 
 #====================================================================================
